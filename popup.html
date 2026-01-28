@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">FocusGuard</h1>
+            <button id="settingsButton" class="settings-button">Settings</button>
+        </header>
+
+        <div id="apiKeyWarning" class="warning hidden">
+            <p>Gemini API key required. Go to Settings to add your key.</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-tabs">
+                <button id="webcamTab" class="tab active">Live Webcam</button>
+                <button id="uploadTab" class="tab">Upload Image</button>
+            </div>
+
+            <div id="webcamSection" class="input-content">
+                <video id="webcamVideo" class="video-preview" autoplay playsinline></video>
+                <div class="webcam-controls">
+                    <button id="startWebcam" class="primary-button">Start Monitoring</button>
+                    <button id="stopWebcam" class="secondary-button hidden">Stop</button>
+                </div>
+            </div>
+
+            <div id="uploadSection" class="input-content hidden">
+                <div id="dropZone" class="drop-zone">
+                    <p>Drop image here or click to select</p>
+                    <input type="file" id="fileInput" accept="image/*" class="file-input">
+                </div>
+                <img id="uploadedImage" class="uploaded-preview hidden">
+                <button id="analyzeImage" class="primary-button hidden">Analyze Image</button>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Analyzing attention...</p>
+        </div>
+
+        <div id="resultsSection" class="results hidden">
+            <div class="score-display">
+                <div class="score-label">Attention Score</div>
+                <div id="scoreValue" class="score-value">--</div>
+                <div id="scoreBar" class="score-bar">
+                    <div id="scoreBarFill" class="score-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="level-display">
+                <span class="level-label">Level:</span>
+                <span id="levelValue" class="level-value">--</span>
+            </div>
+
+            <div class="details-section">
+                <h3>Detection Details</h3>
+                <ul id="detailsList" class="details-list"></ul>
+            </div>
+
+            <div id="geminiAnalysis" class="gemini-section hidden">
+                <h3>AI Analysis</h3>
+                <p id="geminiText" class="gemini-text"></p>
+            </div>
+
+            <div id="switchRecommendation" class="switch-section hidden">
+                <h3>Consider Switching To</h3>
+                <div id="switchContent" class="switch-content"></div>
+            </div>
+
+            <div class="recommendations-section">
+                <h3>Recommended Content Types</h3>
+                <ul id="recommendationsList" class="recommendations-list"></ul>
+            </div>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
