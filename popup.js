@@ -1,6 +1,6 @@
 import { initializeLandmarkers, switchToVideoMode, switchToImageMode, detectFace, detectPose, cleanup } from './lib/mediapipe-loader.js';
 import { analyzeAttention } from './lib/attention-analyzer.js';
-import { setApiKey as setGeminiApiKey, analyzeImage } from './lib/gemini-client.js';
+import { setApiKey as setGeminiApiKey, analyzeImage, getContentRecommendations } from './lib/gemini-client.js';
 import { getRecommendations, getSwitchSuggestion, shouldShowSwitchSuggestion } from './lib/recommendations.js';
 import { getApiKey, getSettings, getSuggestions } from './lib/storage-manager.js';
 import { captureVideoFrame, canvasToBase64, fileToImage, imageToCanvas, fileToBase64, resizeImage } from './lib/image-processor.js';
@@ -38,6 +38,9 @@ const elements = {
     switchRecommendation: document.getElementById('switchRecommendation'),
     switchContent: document.getElementById('switchContent'),
     recommendationsList: document.getElementById('recommendationsList'),
+    contentRecommendations: document.getElementById('contentRecommendations'),
+    currentPageUrl: document.getElementById('currentPageUrl'),
+    contentRecommendationsList: document.getElementById('contentRecommendationsList'),
     statusMessage: document.getElementById('statusMessage')
 };
 
@@ -176,6 +179,8 @@ async function runAnalysis() {
             try {
                 const geminiResponse = await analyzeImage(base64, analysis.overall.score, analysis.overall.level);
                 showGeminiAnalysis(geminiResponse);
+                
+                await showContentRecommendations(analysis.overall.score, analysis.overall.level);
             } catch (geminiError) {
                 console.error('Gemini analysis failed:', geminiError);
             }
@@ -264,6 +269,8 @@ async function analyzeUploadedImage() {
             try {
                 const geminiResponse = await analyzeImage(base64, analysis.overall.score, analysis.overall.level);
                 showGeminiAnalysis(geminiResponse);
+                
+                await showContentRecommendations(analysis.overall.score, analysis.overall.level);
             } catch (geminiError) {
                 console.error('Gemini analysis failed:', geminiError);
             }
@@ -356,10 +363,50 @@ function showSwitchSuggestion(level) {
     elements.switchContent.innerHTML = html;
 }
 
+async function showContentRecommendations(attentionScore, attentionLevel) {
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        
+        if (!tabs || tabs.length === 0) {
+            elements.contentRecommendations.classList.add('hidden');
+            return;
+        }
+        
+        const currentUrl = tabs[0].url;
+        
+        if (!currentUrl || currentUrl.startsWith('chrome://') || currentUrl.startsWith('chrome-extension://')) {
+            elements.contentRecommendations.classList.add('hidden');
+            return;
+        }
+        
+        elements.currentPageUrl.textContent = currentUrl;
+        elements.contentRecommendations.classList.remove('hidden');
+        elements.contentRecommendationsList.innerHTML = '<li class="loading-text">Loading recommendations...</li>';
+        
+        const recommendations = await getContentRecommendations(currentUrl, attentionScore, attentionLevel);
+        
+        const lines = recommendations.split('\n').filter(function(line) {
+            return line.trim().length > 0;
+        });
+        
+        elements.contentRecommendationsList.innerHTML = '';
+        lines.forEach(function(line) {
+            const li = document.createElement('li');
+            li.textContent = line.trim();
+            elements.contentRecommendationsList.appendChild(li);
+        });
+        
+    } catch (error) {
+        console.error('Content recommendations failed:', error);
+        elements.contentRecommendations.classList.add('hidden');
+    }
+}
+
 function hideResults() {
     elements.resultsSection.classList.add('hidden');
     elements.geminiAnalysis.classList.add('hidden');
     elements.switchRecommendation.classList.add('hidden');
+    elements.contentRecommendations.classList.add('hidden');
 }
 
 function showLoading(show) {
