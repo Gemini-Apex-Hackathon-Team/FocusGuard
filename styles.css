@@ -382,6 +382,11 @@ body {
     font-style: italic;
 }
 
+.error-text {
+    color: #ea4335;
+    font-style: italic;
+}
+
 .status-message {
     margin-top: 12px;
     padding: 8px 12px;

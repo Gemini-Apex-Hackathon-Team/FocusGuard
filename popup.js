@@ -374,7 +374,19 @@ async function showContentRecommendations(attentionScore, attentionLevel) {
         
         const currentUrl = tabs[0].url;
         
-        if (!currentUrl || currentUrl.startsWith('chrome://') || currentUrl.startsWith('chrome-extension://')) {
+        const disallowedUrlPrefixes = [
+            'chrome://',
+            'chrome-extension://',
+            'about:',
+            'file://',
+            'data:',
+            'blob:',
+            'javascript:',
+            'edge://',
+            'brave://'
+        ];
+        
+        if (!currentUrl || disallowedUrlPrefixes.some(function(prefix) { return currentUrl.startsWith(prefix); })) {
             elements.contentRecommendations.classList.add('hidden');
             return;
         }
@@ -391,14 +403,19 @@ async function showContentRecommendations(attentionScore, attentionLevel) {
         
         elements.contentRecommendationsList.innerHTML = '';
         lines.forEach(function(line) {
+            const cleanText = line.replace(/^[\d\.\-\*\s]+/, '').trim();
+            if (cleanText.length === 0) {
+                return;
+            }
             const li = document.createElement('li');
-            li.textContent = line.trim();
+            li.textContent = cleanText;
             elements.contentRecommendationsList.appendChild(li);
         });
         
     } catch (error) {
         console.error('Content recommendations failed:', error);
-        elements.contentRecommendations.classList.add('hidden');
+        elements.contentRecommendations.classList.remove('hidden');
+        elements.contentRecommendationsList.innerHTML = '<li class="error-text">Unable to load recommendations. Please try again later.</li>';
     }
 }
 
