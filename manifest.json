@@ -4,7 +4,8 @@
     "version": "1.0.0",
     "description": "Attention detection with content recommendations",
     "permissions": [
-        "storage"
+        "storage",
+        "tabs"
     ],
     "host_permissions": [
         "https://generativelanguage.googleapis.com/*",
