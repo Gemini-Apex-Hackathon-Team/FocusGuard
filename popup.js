@@ -403,7 +403,7 @@ async function showContentRecommendations(attentionScore, attentionLevel) {
         
         elements.contentRecommendationsList.innerHTML = '';
         lines.forEach(function(line) {
-            const cleanText = line.replace(/^[\d\.\-\*\s]+/, '').trim();
+            const cleanText = line.replace(/^[\d.\-\*\s]+/, '').trim();
             if (cleanText.length === 0) {
                 return;
             }
