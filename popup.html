@@ -19,6 +19,7 @@
             <div class="input-tabs">
                 <button id="webcamTab" class="tab active">Live Webcam</button>
                 <button id="uploadTab" class="tab">Upload Image</button>
+                <button id="learningTab" class="tab">Learning Session</button>
             </div>
 
             <div id="webcamSection" class="input-content">
@@ -37,6 +38,76 @@
                 <img id="uploadedImage" class="uploaded-preview hidden">
                 <button id="analyzeImage" class="primary-button hidden">Analyze Image</button>
             </div>
+
+            <div id="learningSection" class="input-content hidden">
+                <div class="learning-input">
+                    <label for="learningUrl">Learning Content URL</label>
+                    <input type="url" id="learningUrl" placeholder="https://example.com/article" class="learning-input-field">
+                    <button id="startLearningSession" class="primary-button">Start Learning Session</button>
+                </div>
+
+                <div id="learningSessionActive" class="learning-session-display hidden">
+                    <div class="session-header">
+                        <h3>Active Learning Session</h3>
+                        <button id="endLearningSession" class="secondary-button">End Session</button>
+                    </div>
+
+                    <div class="session-info">
+                        <div class="session-stat">
+                            <span class="stat-label">Focus:</span>
+                            <span id="sessionFocus" class="stat-value">--</span>
+                        </div>
+                        <div class="session-stat">
+                            <span class="stat-label">Time:</span>
+                            <span id="sessionTime" class="stat-value">00:00</span>
+                        </div>
+                        <div class="session-stat">
+                            <span class="stat-label">Distractions:</span>
+                            <span id="sessionDistractions" class="stat-value">0</span>
+                        </div>
+                    </div>
+
+                    <div class="session-progress">
+                        <p class="progress-label">Session Progress</p>
+                        <div class="progress-bar">
+                            <div id="sessionProgressBar" class="progress-fill"></div>
+                        </div>
+                    </div>
+
+                    <div id="sessionTitle" class="session-title"></div>
+                </div>
+
+                <div id="learningLoading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Loading content and generating quiz...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Modal -->
+        <div id="quizModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Focus Check</h2>
+                    <p class="modal-subtitle">Answer this question to continue</p>
+                </div>
+
+                <div id="quizContainer" class="quiz-container">
+                    <div id="questionDisplay" class="question-display">
+                        <h3 id="questionText"></h3>
+                    </div>
+
+                    <div id="optionsDisplay" class="options-display"></div>
+
+                    <button id="submitAnswerButton" class="primary-button submit-button" disabled>Submit Answer</button>
+                </div>
+
+                <div id="feedbackDisplay" class="feedback-display hidden">
+                    <div id="feedbackContent" class="feedback-content"></div>
+                    <button id="continueLearningButton" class="primary-button" style="margin-top: 15px;">Continue Learning</button>
+                </div>
+            </div>
+        </div>
         </div>
 
         <div id="loadingIndicator" class="loading hidden">
