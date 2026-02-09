@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FYX Focus Reset</title>
+  <style>
+    :root {
+      --bg1: #0ea5e9;
+      --bg2: #22c55e;
+      --bg3: #f59e0b;
+      --bg4: #ef4444;
+      --ink: #071019;
+      --card: rgba(255, 255, 255, 0.9);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3), var(--bg4));
+      background-size: 300% 300%;
+      animation: drift 10s ease infinite;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    @keyframes drift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .card {
+      width: min(760px, 95vw);
+      background: var(--card);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    h1 { margin: 0; font-size: 34px; }
+    .subtitle { margin-top: 8px; font-weight: 600; opacity: 0.75; }
+    .pill { display: inline-block; margin-top: 12px; padding: 8px 12px; border-radius: 999px; background: #111827; color: #fff; font-size: 12px; }
+    .row { margin-top: 18px; }
+    .topic { font-size: 17px; font-weight: 700; }
+    .message { margin-top: 8px; line-height: 1.5; }
+    .challenge {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(17,24,39,0.1);
+    }
+    .question { font-weight: 700; font-size: 20px; margin-bottom: 12px; }
+    .options { display: grid; gap: 10px; }
+    .opt {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: left;
+      background: #111827;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .opt:hover { transform: translateY(-1px); }
+    .result {
+      margin-top: 12px;
+      font-weight: 700;
+      min-height: 26px;
+    }
+    .hint, .mini { margin-top: 10px; font-size: 14px; }
+    .actions { margin-top: 18px; display: flex; gap: 10px; }
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #111827;
+      color: #fff;
+    }
+    .btn.secondary { background: #374151; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Focus Reset</h1>
+    <p class="subtitle">Agent-triggered break tab</p>
+    <div class="pill" id="mode-pill">Mode: Challenge</div>
+
+    <div class="row topic" id="topic">Loading topic...</div>
+    <div class="row message" id="message">Loading coach message...</div>
+
+    <section class="challenge">
+      <div class="question" id="question">Loading challenge...</div>
+      <div class="options" id="options"></div>
+      <div class="result" id="result"></div>
+      <div class="hint" id="hook"></div>
+      <div class="mini" id="mini"></div>
+    </section>
+
+    <div class="actions">
+      <button class="btn" id="continue-btn">Back To Work</button>
+      <button class="btn secondary" id="close-btn">Close Tab</button>
+    </div>
+  </main>
+
+  <script>
+    const topicEl = document.getElementById('topic');
+    const messageEl = document.getElementById('message');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const resultEl = document.getElementById('result');
+    const hookEl = document.getElementById('hook');
+    const miniEl = document.getElementById('mini');
+    const modePill = document.getElementById('mode-pill');
+
+    function render(payload) {
+      const challenge = payload.challenge || {};
+      const options = Array.isArray(challenge.options) ? challenge.options : [];
+      const correctIndex = Number.isInteger(challenge.correctIndex) ? challenge.correctIndex : 0;
+
+      topicEl.textContent = `Topic: ${payload.topic || 'Current page'}`;
+      messageEl.textContent = payload.message || 'Take a short reset and refocus.';
+      questionEl.textContent = challenge.question || 'Which option best matches the main idea?';
+      hookEl.textContent = `Memory hook: ${challenge.memoryHook || 'Keep the main idea in mind.'}`;
+      miniEl.textContent = `Mini challenge: ${challenge.miniChallenge || 'Breathe in for 4s, out for 4s, then continue.'}`;
+      modePill.textContent = `Mode: ${challenge.mode || 'quiz'}`;
+
+      optionsEl.innerHTML = '';
+      options.forEach((opt, index) => {
+        const button = document.createElement('button');
+        button.className = 'opt';
+        button.textContent = opt;
+        button.onclick = () => {
+          const correct = index === correctIndex;
+          resultEl.textContent = correct
+            ? 'Nice. You are back on track.'
+            : 'Close. Re-read the main heading and continue.';
+          resultEl.style.color = correct ? '#065f46' : '#991b1b';
+        };
+        optionsEl.appendChild(button);
+      });
+
+      if (!options.length) {
+        optionsEl.innerHTML = '<button class="opt">Main concept</button><button class="opt">Minor detail</button><button class="opt">Unrelated idea</button>';
+      }
+    }
+
+    chrome.storage.local.get('wakeChallenge', (data) => {
+      render(data.wakeChallenge || {});
+    });
+
+    document.getElementById('continue-btn').addEventListener('click', () => {
+      window.close();
+    });
+
+    document.getElementById('close-btn').addEventListener('click', () => {
+      window.close();
+    });
+  </script>
+</body>
+</html>

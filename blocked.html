@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Blocked - FYX</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .blocked-container {
+      background: white;
+      border-radius: 24px;
+      max-width: 600px;
+      width: 100%;
+      padding: 60px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    
+    .blocked-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      font-size: 36px;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+    
+    .blocked-message {
+      font-size: 18px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    
+    .motivation-quote {
+      font-size: 20px;
+      font-style: italic;
+      color: #3b82f6;
+      margin-bottom: 40px;
+      padding: 24px;
+      background: #eff6ff;
+      border-radius: 16px;
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .blocked-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .blocked-btn {
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+    
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    
+    .stats-box {
+      margin-top: 32px;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 16px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .stat-item {
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="blocked-container">
+    <div class="blocked-icon">🚫</div>
+    
+    <h1>Site Blocked</h1>
+    
+    <div class="blocked-message">
+      This site is on your distraction blocklist. FYX is helping you stay focused on what matters.
+    </div>
+    
+    <div class="motivation-quote">
+      "You're building the habit of deep focus. Every moment of resistance makes you stronger."
+    </div>
+    
+    <div class="stats-box">
+      <strong style="font-size: 16px; color: #1f2937;">Today's Progress</strong>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="blocks-avoided">0</div>
+          <div class="stat-label">Distractions Avoided</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="focus-time">0m</div>
+          <div class="stat-label">Focus Time</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="blocked-actions">
+      <button class="blocked-btn btn-primary" onclick="goBack()">
+        ← Return to Previous Page
+      </button>
+      <button class="blocked-btn btn-secondary" onclick="openSettings()">
+        ⚙️ Manage Blocked Sites
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    // Load statistics
+    async function loadStats() {
+      const stats = await chrome.storage.local.get(['dailyStats', 'blocksAvoided']);
+      
+      if (stats.blocksAvoided) {
+        document.getElementById('blocks-avoided').textContent = stats.blocksAvoided;
+      }
+      
+      if (stats.dailyStats) {
+        const minutes = Math.floor(stats.dailyStats.focusTime / 60);
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        
+        if (hours > 0) {
+          document.getElementById('focus-time').textContent = `${hours}h ${remainingMinutes}m`;
+        } else {
+          document.getElementById('focus-time').textContent = `${minutes}m`;
+        }
+      }
+      
+      // Increment blocks avoided
+      const newCount = (stats.blocksAvoided || 0) + 1;
+      chrome.storage.local.set({ blocksAvoided: newCount });
+      document.getElementById('blocks-avoided').textContent = newCount;
+    }
+    
+    function goBack() {
+      window.history.back();
+    }
+    
+    function openSettings() {
+      chrome.runtime.sendMessage({ type: 'OPEN_SETTINGS' });
+    }
+    
+    loadStats();
+  </script>
+</body>
+</html>

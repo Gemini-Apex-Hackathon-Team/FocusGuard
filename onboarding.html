@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to FYX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f1a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+      animation: bgFloat 20s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes bgFloat {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-20px, 10px); }
+      66% { transform: translate(10px, -15px); }
+    }
+
+    .onboarding-container {
+      position: relative; z-index: 1;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      max-width: 560px;
+      width: 100%;
+      padding: 48px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+      margin: auto;
+    }
+
+    .onboarding-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .onboarding-header h1 {
+      font-size: 52px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #a78bfa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .onboarding-header p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .onboarding-step { display: none; }
+    .onboarding-step.active {
+      display: block;
+      animation: stepSlide 0.4s ease;
+    }
+
+    @keyframes stepSlide {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .step-content h2 {
+      font-size: 26px;
+      color: #f1f5f9;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .step-content p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    /* Name input */
+    .name-input {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      color: white;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .name-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    .name-input:focus {
+      border-color: #818cf8;
+      box-shadow: 0 0 20px rgba(129, 140, 248, 0.2);
+    }
+    .api-input-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    /* Attention level cards */
+    .attention-cards {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .attention-card {
+      flex: 1;
+      padding: 24px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .attention-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+    }
+    .attention-card.selected {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+      border-color: #818cf8;
+      box-shadow: 0 0 30px rgba(129, 140, 248, 0.15);
+    }
+    .card-emoji { font-size: 40px; margin-bottom: 12px; }
+    .attention-card h3 { font-size: 18px; color: #f1f5f9; margin-bottom: 8px; font-weight: 700; }
+    .attention-card p { font-size: 13px; color: rgba(255, 255, 255, 0.5); line-height: 1.4; margin: 0; }
+
+    /* Feature / privacy list */
+    .feature-list { list-style: none; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      margin-bottom: 14px; padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      transition: background 0.2s;
+    }
+    .feature-item:hover { background: rgba(255, 255, 255, 0.07); }
+    .feature-icon { font-size: 24px; flex-shrink: 0; }
+    .feature-text h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 4px; font-weight: 600; }
+    .feature-text p { font-size: 13px; color: rgba(255, 255, 255, 0.5); margin: 0; line-height: 1.4; }
+
+    /* Face calibration */
+    .calibration-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .calibration-preview {
+      width: 280px; height: 210px;
+      margin: 0 auto 16px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    .calibration-preview video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+    .calibration-preview canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      transform: scaleX(-1);
+    }
+    .calibration-step-label {
+      font-size: 18px; font-weight: 600; color: #a78bfa;
+      margin-bottom: 8px;
+    }
+    .calibration-instruction {
+      font-size: 14px; color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 16px;
+    }
+    .calibration-btn {
+      padding: 12px 28px; font-size: 15px; font-weight: 600;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white; border: none; border-radius: 12px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .calibration-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+    .calibration-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .calibration-progress {
+      display: flex; gap: 8px; justify-content: center; margin-top: 16px;
+    }
+    .cal-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      transition: all 0.3s;
+    }
+    .cal-dot.done { background: #10b981; }
+    .cal-dot.active { background: #818cf8; transform: scale(1.3); }
+
+    /* Permission cards */
+    .permission-cards { display: flex; flex-direction: column; gap: 14px; }
+    .permission-card {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+    }
+    .permission-card .perm-icon { font-size: 28px; flex-shrink: 0; }
+    .permission-card .perm-info { flex: 1; }
+    .permission-card .perm-info h3 { font-size: 15px; color: #e2e8f0; margin-bottom: 4px; }
+    .permission-card .perm-info p { font-size: 13px; color: rgba(255, 255, 255, 0.4); margin: 0; }
+    .permission-btn {
+      padding: 8px 16px; font-size: 13px; font-weight: 600;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white; border: none; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .permission-btn:hover { transform: translateY(-2px); }
+    .permission-btn.granted { background: #10b981; cursor: default; }
+    .permission-btn.granted:hover { transform: none; }
+    .permission-btn.skipped { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); cursor: default; }
+
+    /* Navigation */
+    .onboarding-actions {
+      display: flex; gap: 12px; margin-top: 32px;
+    }
+    .onboarding-btn {
+      flex: 1; padding: 16px 32px; font-size: 16px; font-weight: 600;
+      border: none; border-radius: 14px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
+
+    /* Progress dots */
+    .progress-dots {
+      display: flex; justify-content: center; gap: 8px; margin-top: 28px;
+    }
+    .progress-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      transition: all 0.3s;
+    }
+    .progress-dot.active {
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      width: 32px; border-radius: 5px;
+    }
+    .progress-dot.completed { background: #10b981; }
+  </style>
+</head>
+<body>
+  <div class="onboarding-container">
+    <div class="onboarding-header">
+      <h1>FYX</h1>
+      <p>Your AI focus companion</p>
+    </div>
+
+    <!-- Step 1: Name -->
+    <div class="onboarding-step active" id="step-1">
+      <div class="step-content">
+        <h2>What's your name?</h2>
+        <p>We'll use this to personalize your focus experience.</p>
+        <input type="text" class="name-input" id="user-name-input" placeholder="Enter your name" autofocus>
+      </div>
+    </div>
+
+    <!-- Step 2: Attention Level -->
+    <div class="onboarding-step" id="step-2">
+      <div class="step-content">
+        <h2>How would you rate your attention span?</h2>
+        <p>No judgment — this helps FYX calibrate for you.</p>
+        <div class="attention-cards">
+          <div class="attention-card" data-level="low">
+            <div class="card-emoji">🌊</div>
+            <h3>Low</h3>
+            <p>I get distracted easily and lose track often</p>
+          </div>
+          <div class="attention-card" data-level="medium">
+            <div class="card-emoji">🎯</div>
+            <h3>Medium</h3>
+            <p>I can focus but drift off during long tasks</p>
+          </div>
+          <div class="attention-card" data-level="high">
+            <div class="card-emoji">🚀</div>
+            <h3>High</h3>
+            <p>I stay focused but want to optimize further</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Privacy & How it Works -->
+    <div class="onboarding-step" id="step-3">
+      <div class="step-content">
+        <h2>How FYX works</h2>
+        <p>FYX uses AI to understand your focus patterns and intervene when needed.</p>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">🔒</span>
+            <div class="feature-text">
+              <h3>Privacy First</h3>
+              <p>All processing happens locally. No images or audio are stored or transmitted.</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">📹</span>
+            <div class="feature-text">
+              <h3>Optional Camera</h3>
+              <p>Detects drowsiness using facial landmarks only. Completely optional.</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">🤖</span>
+            <div class="feature-text">
+              <h3>Gemini AI Powered</h3>
+              <p>Understands what you're learning and creates personalized interventions.</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">🌐</span>
+            <div class="feature-text">
+              <h3>Browser Activity</h3>
+              <p>Tracks tabs, scrolling, and mouse activity to detect focus levels.</p>
+            </div>
+          </li>
+        </ul>
+        <div class="api-input-note">
+          Gemini API is preconfigured by the developer in <code>local-config.js</code>.
+          End users are not asked for an API key.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Face Calibration -->
+    <div class="onboarding-step" id="step-4">
+      <div class="step-content">
+        <h2>Let's learn your face</h2>
+        <p>This helps FYX detect when you're tired, bored, or looking away.</p>
+        <div class="calibration-area">
+          <div class="calibration-preview" id="cal-preview">
+            <video id="cal-video" autoplay playsinline></video>
+            <canvas id="cal-canvas"></canvas>
+          </div>
+          <div class="calibration-step-label" id="cal-step-label">Step 1: Look at the screen normally</div>
+          <div class="calibration-instruction" id="cal-instruction">Position your face in the frame and click Capture</div>
+          <button class="calibration-btn" id="cal-capture-btn" disabled>Capture</button>
+          <div class="calibration-progress">
+            <div class="cal-dot active" id="cal-dot-1"></div>
+            <div class="cal-dot" id="cal-dot-2"></div>
+            <div class="cal-dot" id="cal-dot-3"></div>
+          </div>
+        </div>
+        <button class="onboarding-btn btn-secondary" id="skip-calibration" style="width:100%; margin-top:12px; font-size:13px;">
+          Skip calibration (you can do this later)
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 5: All Set -->
+    <div class="onboarding-step" id="step-5">
+      <div class="step-content" style="text-align:center;">
+        <div style="font-size:72px; margin-bottom:20px;">✨</div>
+        <h2>You're all set!</h2>
+        <p>Click the FYX icon in your toolbar to start a focus session. FYX will track your attention and help you stay on track.</p>
+        <ul class="feature-list" style="text-align:left; margin-top:24px;">
+          <li class="feature-item">
+            <span class="feature-icon">👁️</span>
+            <div class="feature-text">
+              <h3>We'll track your engagement</h3>
+              <p>Non-intrusively monitor how you interact with content</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">💡</span>
+            <div class="feature-text">
+              <h3>Smart interventions</h3>
+              <p>Quizzes, fun popups, and breaks when your focus drops</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">📊</span>
+            <div class="feature-text">
+              <h3>Track your progress</h3>
+              <p>Dashboard shows focus trends and AI insights over time</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="onboarding-actions">
+      <button class="onboarding-btn btn-secondary" id="btn-back" style="display: none;">Back</button>
+      <button class="onboarding-btn btn-primary" id="btn-next">Get Started</button>
+    </div>
+
+    <!-- Progress Dots -->
+    <div class="progress-dots">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+
+  <script src="camera-tracker.js"></script>
+  <script src="onboarding.js"></script>
+</body>
+</html>
