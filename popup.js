@@ -1,3 +1,6 @@
+//not being used 
+
+
 import { initializeLandmarkers, switchToVideoMode, switchToImageMode, detectFace, detectPose, cleanup } from './lib/mediapipe-loader.js';
 import { analyzeAttention } from './lib/attention-analyzer.js';
 import { setApiKey as setGeminiApiKey, analyzeLandmarks, analyzeImage, isQuotaExceeded, getRemainingCooldown } from './lib/gemini-client.js';

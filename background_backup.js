@@ -19,16 +19,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }
 });
 
-// Handle extension icon click to open side panel
-chrome.action.onClicked.addListener(async (tab) => {
-    console.log('🎯 Extension icon clicked - opening side panel');
-    try {
-        await chrome.sidePanel.open({ tabId: tab.id });
-    } catch (error) {
-        console.error('❌ Error opening side panel:', error);
-    }
-});
-
 // Listen for messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('📨 Background received message:', request.action);
@@ -202,74 +192,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             articleContext: currentArticleContext
         });
     }
-    else if (request.action === 'checkUserFocus') {
-        handleCheckUserFocus(request.data, sender, sendResponse);
-        return true; // Keep channel open for async response
-    }
-    else if (request.action === 'DISTRACTION_POPUP_RESPONSE') {
-        console.log('💬 User responded to distraction popup:', request.response);
-        // Track the response
-        if (currentLearningSession) {
-            if (!currentLearningSession.distractionResponses) {
-                currentLearningSession.distractionResponses = [];
-            }
-            currentLearningSession.distractionResponses.push({
-                timestamp: request.timestamp,
-                response: request.response
-            });
-            chrome.storage.local.set({ currentLearningSession });
-        }
-        sendResponse({ success: true });
-    }
 });
-
-/**
- * Handle focus check from side panel
- * Decides whether to show distraction popup
- */
-async function handleCheckUserFocus(data, sender, sendResponse) {
-    try {
-        const attentionScore = data?.attentionScore || 0;
-        const distractionScore = data?.distractionScore || 0;
-
-        console.log(`👁️ Attention: ${attentionScore}% | Distraction: ${distractionScore}%`);
-
-        let shouldShowPopup = false;
-
-        // Decide if popup is needed
-        if (distractionScore > 60) {
-            shouldShowPopup = true;
-            console.log('⚠️ User is distracted - showing popup');
-        } else if (attentionScore < 40) {
-            shouldShowPopup = true;
-            console.log('👀 Low attention - showing popup');
-        }
-
-        // Send popup to active tab if needed
-        if (shouldShowPopup) {
-            try {
-                const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-                if (activeTab) {
-                    console.log(`📢 Sending popup to tab ${activeTab.id}`);
-                    chrome.tabs.sendMessage(activeTab.id, {
-                        action: 'SHOW_DISTRACTION_POPUP'
-                    }).catch(err => {
-                        console.warn('⚠️ Could not send popup to tab:', err.message);
-                    });
-                }
-            } catch (error) {
-                console.warn('⚠️ Error getting active tab:', error.message);
-            }
-        }
-
-        sendResponse({
-            success: true,
-            shouldShowPopup: shouldShowPopup
-        });
-    } catch (error) {
-        console.error('❌ Error in focus check:', error);
-        sendResponse({ success: false, error: error.message });
-    }
-}
 
 console.log('✅ Background service worker ready for article monitoring');

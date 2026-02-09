@@ -1,0 +1,327 @@
+/* ===========================
+   Distraction Focus Check Popup
+   =========================== */
+
+.distraction-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.distraction-popup.hidden {
+    display: none !important;
+}
+
+/* Backdrop blur overlay */
+.distraction-popup-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: -1;
+}
+
+/* Modal dialog */
+.distraction-popup-modal {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border-radius: 20px;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popupSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Header section */
+.popup-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.popup-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.popup-header p {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Options container */
+.popup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+/* Individual focus option buttons */
+.focus-option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: #f3f4f6;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    width: 100%;
+    text-align: left;
+}
+
+.focus-option:hover {
+    background: #e5e7eb;
+    transform: translateX(4px);
+}
+
+.focus-option:active {
+    transform: translateX(2px);
+}
+
+/* Yes - Fully Engaged */
+.focus-option-yes {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #bbf7d0;
+    color: #15803d;
+}
+
+.focus-option-yes:hover {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+}
+
+.focus-option-yes .option-icon {
+    font-size: 20px;
+}
+
+/* Partial - Somewhat Distracted */
+.focus-option-partial {
+    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+    border-color: #fde047;
+    color: #854d0e;
+}
+
+.focus-option-partial:hover {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+    box-shadow: 0 4px 12px rgba(202, 138, 4, 0.15);
+}
+
+.focus-option-partial .option-icon {
+    font-size: 20px;
+}
+
+/* No - Not Paying Attention */
+.focus-option-no {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.focus-option-no:hover {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+}
+
+.focus-option-no .option-icon {
+    font-size: 20px;
+}
+
+/* Option icon styling */
+.option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+/* Option text styling */
+.option-text {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Footer section with time pressure */
+.popup-footer {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.time-pressure {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ef4444;
+    animation: timePulse 1.5s ease-in-out infinite;
+    letter-spacing: 0.5px;
+}
+
+@keyframes timePulse {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.02);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .distraction-popup-modal {
+        padding: 28px 20px;
+        border-radius: 16px;
+        width: 95%;
+    }
+
+    .popup-header h2 {
+        font-size: 24px;
+    }
+
+    .popup-header p {
+        font-size: 14px;
+    }
+
+    .popup-options {
+        gap: 10px;
+    }
+
+    .focus-option {
+        padding: 14px 16px;
+        font-size: 14px;
+        gap: 12px;
+    }
+
+    .option-icon {
+        min-width: 24px;
+        font-size: 18px;
+    }
+
+    .option-text {
+        font-size: 14px;
+    }
+}
+
+/* ===========================
+   Animation variants
+   =========================== */
+
+/* Success flash on selection */
+@keyframes optionSelected {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.focus-option.selected {
+    animation: optionSelected 0.3s ease;
+}
+
+/* ===========================
+   Dark mode support (if needed)
+   =========================== */
+
+@media (prefers-color-scheme: dark) {
+    .distraction-popup-modal {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+
+    .popup-header h2 {
+        color: #f9fafb;
+    }
+
+    .popup-header p {
+        color: #d1d5db;
+    }
+
+    .focus-option {
+        background: #374151;
+        color: #e5e7eb;
+    }
+
+    .focus-option:hover {
+        background: #4b5563;
+    }
+
+    .focus-option-yes {
+        background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+        border-color: #059669;
+        color: #a7f3d0;
+    }
+
+    .focus-option-yes:hover {
+        background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    }
+
+    .focus-option-partial {
+        background: linear-gradient(135deg, #713f12 0%, #92400e 100%);
+        border-color: #b45309;
+        color: #fcd34d;
+    }
+
+    .focus-option-partial:hover {
+        background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+    }
+
+    .focus-option-no {
+        background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+        border-color: #dc2626;
+        color: #fca5a5;
+    }
+
+    .focus-option-no:hover {
+        background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+    }
+
+    .popup-footer {
+        border-top-color: #4b5563;
+    }
+}

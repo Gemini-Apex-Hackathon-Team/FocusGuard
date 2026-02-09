@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FYX - Focus Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="side-panel.css">
+</head>
+<body>
+    <div class="side-panel-container">
+        <!-- Header -->
+        <header class="panel-header">
+            <div class="header-content">
+                <button id="navBackBtn" class="nav-back-btn hidden" aria-label="Go back">
+                    ← Back
+                </button>
+                <div class="header-title">
+                    <h1>🧠 FYX</h1>
+                    <p class="subtitle">Focus assistant powered by AI</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="navSettingsBtn" class="nav-settings-btn" aria-label="Open settings" title="Settings">
+                    ⚙️
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="panel-content">
+            <!-- Onboarding View (shown on first launch) -->
+            <div id="onboardingView" class="page-view active">
+                <div class="onboarding-container">
+                    <div class="onboarding-header">
+                        <h2>Welcome to FYX! 🧠</h2>
+                        <p>Let's personalize your experience</p>
+                    </div>
+
+                    <!-- Step 1: Welcome -->
+                    <div class="onboarding-step active" id="onboarding-step-1">
+                        <h3>Welcome to FYX!</h3>
+                        <p>FYX helps you work with your brain, not against it. We understand that maintaining focus in the digital age is challenging.</p>
+                        
+                        <ul class="feature-list">
+                            <li><span class="feature-icon">🎯</span> <strong>Smart Attention Tracking</strong> - Monitor your focus without being intrusive</li>
+                            <li><span class="feature-icon">🤖</span> <strong>AI-Powered Interventions</strong> - Get personalized suggestions when you need them</li>
+                            <li><span class="feature-icon">📝</span> <strong>Comprehension Quizzes</strong> - Verify you're actually learning from content</li>
+                            <li><span class="feature-icon">☕</span> <strong>Smart Break Management</strong> - Take breaks when your brain needs them</li>
+                        </ul>
+                    </div>
+
+                    <!-- Step 2: Attention Assessment -->
+                    <div class="onboarding-step" id="onboarding-step-2">
+                        <h3>How's your attention span?</h3>
+                        <p>Be honest - this helps us personalize your experience. On a scale of 1-10, how would you rate your ability to stay focused on a single task?</p>
+                        
+                        <div class="attention-scale">
+                            <div class="scale-option" data-value="1"><div class="scale-number">1</div><div class="scale-label">Very Poor</div></div>
+                            <div class="scale-option" data-value="2"><div class="scale-number">2</div></div>
+                            <div class="scale-option" data-value="3"><div class="scale-number">3</div></div>
+                            <div class="scale-option" data-value="4"><div class="scale-number">4</div></div>
+                            <div class="scale-option selected" data-value="5"><div class="scale-number">5</div><div class="scale-label">Average</div></div>
+                            <div class="scale-option" data-value="6"><div class="scale-number">6</div></div>
+                            <div class="scale-option" data-value="7"><div class="scale-number">7</div></div>
+                            <div class="scale-option" data-value="8"><div class="scale-number">8</div></div>
+                            <div class="scale-option" data-value="9"><div class="scale-number">9</div></div>
+                            <div class="scale-option" data-value="10"><div class="scale-number">10</div><div class="scale-label">Excellent</div></div>
+                        </div>
+                        
+                        <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 16px;">
+                            Selected: <strong id="selected-value">5</strong>
+                        </p>
+                    </div>
+
+                    <!-- Step 3: Complete -->
+                    <div class="onboarding-step" id="onboarding-step-3">
+                        <h3>🎉 You're All Set!</h3>
+                        <p>FYX is now configured and ready to help you maintain better focus. Here's what happens next:</p>
+                        
+                        <ul class="feature-list">
+                            <li><span class="feature-icon">👁️</span> <strong>We'll track your engagement</strong> - Non-intrusively monitor how you interact with web content</li>
+                            <li><span class="feature-icon">💡</span> <strong>Get helpful nudges</strong> - When your focus drops, we'll suggest what to do</li>
+                            <li><span class="feature-icon">📊</span> <strong>Track your progress</strong> - See how your focus improves over time</li>
+                        </ul>
+                        
+                        <p style="font-size: 13px; color: #6b7280; text-align: center; margin-top: 20px;">
+                            Click the FYX icon in your toolbar anytime to check your focus score or start a focus session!
+                        </p>
+                        <p style="font-size: 13px; color: #6b7280; text-align: center; margin-top: 12px;">
+                            Don't forget to add your Gemini API key in settings later to enable AI features!
+                        </p>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="onboarding-actions">
+                        <button class="btn btn-secondary" id="onboarding-btn-back" style="display: none;">
+                            ← Back
+                        </button>
+                        <button class="btn btn-primary" id="onboarding-btn-next">
+                            Get Started
+                        </button>
+                    </div>
+
+                    <!-- Progress Dots -->
+                    <div class="progress-dots">
+                        <div class="progress-dot active"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Page View -->
+            <div id="mainPageView" class="page-view active">
+                <!-- Status Section -->
+                <section class="status-section">
+                    <div class="status-card">
+                        <div class="status-indicator" id="statusIndicator">
+                            <span class="status-dot idle"></span>
+                            <span class="status-text">Ready</span>
+                        </div>
+                        <div class="current-session hidden" id="currentSession">
+                            <p class="session-title" id="sessionTitle">—</p>
+                            <p class="session-info" id="sessionInfo">—</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Focus Mode Controls -->
+                <section class="focus-controls-section">
+                    <div class="focus-buttons">
+                        <button id="enableFocusBtn" class="btn btn-primary focus-btn">
+                            🎯 Enable Focus Mode
+                        </button>
+                        <button id="disableFocusBtn" class="btn btn-secondary focus-btn hidden">
+                            ⏹️ Disable Focus Mode
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Focus Mode Layout -->
+                <section class="focus-mode-layout hidden" id="focusModeLayout">
+                    <!-- Main Content Area: Camera & Timer Stack -->
+                    <div class="focus-content-area">
+                        <!-- Camera Feed (Full Width) -->
+                        <section class="camera-section-focus-mode">
+                            <div class="camera-container-focus-mode">
+                                <video id="cameraFeedFocusMode" class="camera-feed-focus-mode" autoplay playsinline muted></video>
+                                <canvas id="cameraCanvasFocusMode" class="hidden"></canvas>
+                                <div id="cameraOverlayFocusMode" class="camera-overlay-focus-mode">
+                                    <div class="face-detection-box"></div>
+                                </div>
+                                <button id="toggleCameraBtnFocusMode" class="camera-toggle-btn-focus-mode" title="Toggle camera">📷</button>
+                                <div id="cameraStatusFocusMode" class="camera-status-focus-mode">
+                                    <span id="cameraStatusText">Initializing...</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Focus Timer -->
+                        <section class="focus-timer-section-full">
+                            <div class="timer-card-focus-mode">
+                                <div class="timer-display-focus-mode">
+                                    <div class="timer-time-focus-mode" id="timerDisplayFocusMode">25:00</div>
+                                    <div class="timer-label-focus-mode">Focus Time</div>
+                                </div>
+                                <div class="timer-controls-focus-mode">
+                                    <button id="startTimerBtnFocusMode" class="btn btn-primary btn-xs">
+                                        ▶️
+                                    </button>
+                                    <button id="pauseTimerBtnFocusMode" class="btn btn-secondary btn-xs hidden">
+                                        ⏸️
+                                    </button>
+                                    <button id="resetTimerBtnFocusMode" class="btn btn-secondary btn-xs">
+                                        🔄
+                                    </button>
+                                </div>
+                                <div class="timer-preset-focus-mode">
+                                    <input type="number" id="timerDurationFocusMode" class="input-field-compact" min="1" max="120" value="25">
+                                </div>
+                            </div>
+                        </section>
+
+
+                    </div>
+                </section>
+
+                <!-- Regular Pomodoro Timer (When not in focus mode) -->
+                <section class="pomodoro-section" id="pomodoroSection">
+                    <div class="timer-card">
+                        <div class="timer-display">
+                            <div class="timer-time" id="timerDisplay">25:00</div>
+                            <div class="timer-label">Focus Time</div>
+                        </div>
+                        <div class="timer-controls">
+                            <button id="startTimerBtn" class="btn btn-primary btn-sm">
+                                ▶️ Start
+                            </button>
+                            <button id="pauseTimerBtn" class="btn btn-secondary btn-sm hidden">
+                                ⏸️ Pause
+                            </button>
+                            <button id="resetTimerBtn" class="btn btn-secondary btn-sm">
+                                🔄 Reset
+                            </button>
+                        </div>
+                        <div class="timer-preset">
+                            <label>Duration (minutes):</label>
+                            <input type="number" id="timerDuration" class="input-field" min="1" max="120" value="25">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Camera Feed Section (Regular View) -->
+                <section class="camera-section" id="cameraSection">
+                    <div class="camera-container">
+                        <video id="cameraFeed" class="camera-feed" autoplay playsinline muted></video>
+                        <canvas id="cameraCanvas" class="hidden"></canvas>
+                        <div id="cameraOverlay" class="camera-overlay">
+                            <div class="face-detection-box"></div>
+                        </div>
+                        <button id="toggleCameraBtn" class="camera-toggle-btn" title="Toggle camera">📷</button>
+                        <div id="cameraStatus" class="camera-status">
+                            <span id="cameraStatusText">Initializing...</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Attention Score Section -->
+                <section class="attention-section">
+                    <div class="attention-header">
+                        <h3>Attention Score</h3>
+                        <span class="attention-value" id="attentionValue">—</span>
+                    </div>
+                    <div class="attention-bar">
+                        <div class="attention-progress" id="attentionProgress"></div>
+                    </div>
+                    <div class="attention-message" id="attentionMessage"></div>
+                </section>
+
+                <!-- Session Stats -->
+                <section class="stats-section" id="statsSection">
+                    <button id="statsToggleBtn" class="stats-header-toggle" title="Toggle stats">
+                        <span class="stats-toggle-icon">▼</span>
+                        <span class="stats-toggle-text">Session Stats</span>
+                    </button>
+                    <div id="statsContent" class="stats-content">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Duration</span>
+                                <span class="stat-value" id="durationStat">0:00</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Focus %</span>
+                                <span class="stat-value" id="focusStat">—</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Avg Score</span>
+                                <span class="stat-value" id="avgScoreStat">—</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Peak Focus</span>
+                                <span class="stat-value" id="peakFocusStat">—</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Low Focus</span>
+                                <span class="stat-value" id="lowFocusStat">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Quizzes</span>
+                                <span class="stat-value" id="quizStat">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Active Controls -->
+                <section class="controls-section hidden" id="controlsSection">
+                    <button id="pauseBtn" class="btn btn-secondary">
+                        ⏸️ Pause Session
+                    </button>
+                    <button id="endSessionBtn" class="btn btn-danger">
+                        ⏹️ End Session
+                    </button>
+                </section>
+
+                <!-- Notifications -->
+                <div class="notifications" id="notificationsContainer"></div>
+            </div>
+
+            <!-- Settings Page View -->
+            <div id="settingsPageView" class="page-view">
+                <section class="settings-content">
+                    <h2>Settings</h2>
+                    
+                    <!-- API Configuration -->
+                    <div class="settings-section-header">🔑 API Configuration</div>
+                    
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Gemini API Key</span>
+                            <p class="setting-desc">Your Google Gemini API key for AI features</p>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" id="settingGeminiApiKey" class="input-field" placeholder="Enter your Gemini API key">
+                            <button id="settingToggleApiKey" class="toggle-btn" title="Show/Hide">👁️</button>
+                        </div>
+                        <small class="setting-hint">Get your key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+                    </div>
+
+                    <div class="settings-group">
+                        <button id="settingSaveApiKey" class="btn btn-secondary" style="margin-right: 8px; width: 48%;">
+                            💾 Save API Key
+                        </button>
+                        <button id="settingTestApiKey" class="btn btn-secondary" style="width: 48%;">
+                            🧪 Test Connection
+                        </button>
+                    </div>
+                    <div id="settingApiKeyStatus" class="status-message"></div>
+
+                    <!-- Feature Toggles -->
+                    <div class="settings-section-header">⚙️ Features</div>
+                    
+                    <div class="settings-group">
+                        <label class="setting-item">
+                            <div class="setting-label">
+                                <span>Enable Auto-Detection</span>
+                                <p class="setting-desc">Automatically detect articles on web pages</p>
+                            </div>
+                            <input type="checkbox" id="settingAutoDetection" class="toggle">
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-item">
+                            <div class="setting-label">
+                                <span>Enable Gemini Quizzes</span>
+                                <p class="setting-desc">AI-powered quiz generation for learning sessions</p>
+                            </div>
+                            <input type="checkbox" id="settingEnableGemini" class="toggle">
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-item">
+                            <div class="setting-label">
+                                <span>Enable Switch Suggestions</span>
+                                <p class="setting-desc">Get notified to switch tabs during low focus</p>
+                            </div>
+                            <input type="checkbox" id="settingEnableSwitchSuggestions" class="toggle">
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-item">
+                            <div class="setting-label">
+                                <span>Enable Distraction Blocking</span>
+                                <p class="setting-desc">Block distracting websites during focus sessions</p>
+                            </div>
+                            <input type="checkbox" id="settingEnableBlocking" class="toggle">
+                        </label>
+                    </div>
+
+                    <!-- Analysis Settings -->
+                    <div class="settings-section-header">📊 Analysis</div>
+                    
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Analysis Interval</span>
+                            <p class="setting-desc">How often to check your focus level</p>
+                        </label>
+                        <select id="settingAnalysisInterval" class="input-field">
+                            <option value="1">Every 1 second (High frequency)</option>
+                            <option value="2">Every 2 seconds</option>
+                            <option value="3" selected>Every 3 seconds (Recommended)</option>
+                            <option value="5">Every 5 seconds</option>
+                            <option value="10">Every 10 seconds</option>
+                            <option value="15">Every 15 seconds</option>
+                            <option value="30">Every 30 seconds (Low frequency)</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Attention Threshold (%)</span>
+                            <p class="setting-desc">Minimum focus level before suggesting a break (0-100)</p>
+                        </label>
+                        <input type="number" id="settingAttentionThreshold" class="input-field" min="0" max="100" value="50">
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Gemini Update Interval</span>
+                            <p class="setting-desc">How often to send attention data to Gemini for recommendations (in minutes)</p>
+                        </label>
+                        <select id="settingGeminiInterval" class="input-field">
+                            <option value="1">Every 1 minute</option>
+                            <option value="3">Every 3 minutes</option>
+                            <option value="5" selected>Every 5 minutes (Recommended)</option>
+                            <option value="10">Every 10 minutes</option>
+                        </select>
+                    </div>
+
+                    <!-- Quiz Settings -->
+                    <div class="settings-section-header">❓ Quiz Settings</div>
+                    
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Quiz Difficulty</span>
+                            <p class="setting-desc">Choose the difficulty level for AI-generated quizzes</p>
+                        </label>
+                        <select id="settingQuizDifficulty" class="input-field">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Questions per Quiz</span>
+                            <p class="setting-desc">Number of questions in each quiz (1-10)</p>
+                        </label>
+                        <input type="number" id="settingQuestionsPerQuiz" class="input-field" min="1" max="10" value="5">
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="settings-section-header">🔔 Notifications</div>
+                    
+                    <div class="settings-group">
+                        <label class="setting-item">
+                            <div class="setting-label">
+                                <span>Enable Notifications</span>
+                                <p class="setting-desc">Show notifications for focus alerts and milestones</p>
+                            </div>
+                            <input type="checkbox" id="settingEnableNotifications" class="toggle" checked>
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="setting-label">
+                            <span>Break Reminder Interval (minutes)</span>
+                            <p class="setting-desc">How often to suggest taking a break (5-60 minutes)</p>
+                        </label>
+                        <input type="number" id="settingBreakInterval" class="input-field" min="5" max="60" value="25">
+                    </div>
+
+                    <!-- Data & Privacy -->
+                    <div class="settings-section-header">🔒 Data & Privacy</div>
+                    
+                    <div class="settings-group">
+                        <label class="setting-item">
+                            <div class="setting-label">
+                                <span>Save Attention History</span>
+                                <p class="setting-desc">Store attention scores for analytics (local only)</p>
+                            </div>
+                            <input type="checkbox" id="settingEnableHistory" class="toggle" checked>
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <button id="settingClearDataBtn" class="btn btn-secondary" style="margin-top: 8px;">
+                            🗑️ Clear All Data
+                        </button>
+                    </div>
+
+                    <!-- Onboarding & Profile -->
+                    <div class="settings-section-header">👤 Profile & Onboarding</div>
+                    
+                    <div class="settings-group">
+                        <p class="setting-desc" style="margin: 0 0 12px 0;">Restart the onboarding process to recalibrate your attention profile.</p>
+                        <button id="settingRestartOnboardingBtn" class="btn btn-secondary">
+                            🔄 Recalibrate Profile
+                        </button>
+                    </div>
+
+                    <!-- Switch Suggestions -->
+                    <div class="settings-section-header">💡 Switch Suggestions</div>
+                    <p class="setting-desc" style="margin: 0 0 12px 0;">Configure what content to suggest when attention is low.</p>
+                    
+                    <div id="settingSuggestionList" class="suggestion-list"></div>
+
+                    <div class="settings-group">
+                        <input type="text" id="settingNewSuggestionTitle" class="input-field" placeholder="Title (e.g., Take a Break)">
+                        <input type="text" id="settingNewSuggestionUrl" class="input-field" placeholder="URL (optional)">
+                        <input type="text" id="settingNewSuggestionDesc" class="input-field" placeholder="Description">
+                        <button id="settingAddSuggestion" class="btn btn-secondary" style="margin-top: 8px;">
+                            ➕ Add Suggestion
+                        </button>
+                    </div>
+
+                    <!-- Reset Settings -->
+                    <div class="settings-group">
+                        <button id="settingResetBtn" class="btn btn-danger" style="margin-top: 12px;">
+                            ⚠️ Reset All Settings
+                        </button>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="settings-group">
+                        <button id="settingSaveBtn" class="btn btn-primary" style="margin-top: 16px;">
+                            ✅ Save Settings
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+
+        <!-- Footer -->
+        <footer class="panel-footer">
+            <p class="footer-text">FYX v1.0 • Focus assistant powered by AI</p>
+        </footer>
+    </div>
+
+    <script src="side-panel.js" type="module"></script>
+</body>
+</html>
+
