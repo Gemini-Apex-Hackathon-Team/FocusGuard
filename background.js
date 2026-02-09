@@ -1331,6 +1331,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: true });
       }
 
+      else if (message.type === 'REQUEST_INACTIVITY_QUIZ') {
+        // Triggered by content script after 10s of user inactivity
+        const tabId = sender?.tab?.id;
+        if (tabId) {
+          try {
+            const content = await chrome.tabs.sendMessage(tabId, { type: 'GET_PAGE_CONTENT' });
+            if (content && content.text) {
+              const quiz = await generateQuiz(content);
+              await chrome.tabs.sendMessage(tabId, { type: 'SHOW_QUIZ', quiz });
+              await logGeminiReasoning({
+                type: 'quiz',
+                message: `Inactivity quiz: "${quiz.question}"`
+              });
+            }
+          } catch { /* tab may have closed */ }
+        }
+        sendResponse({ success: true });
+      }
+
       else if (message.type === 'GEN_QUIZ') {
         const content = message.content || '';
         const title = message.title || 'Untitled';

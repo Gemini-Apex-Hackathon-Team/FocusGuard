@@ -271,6 +271,16 @@ async function startCamera() {
       });
     }, 2000);
 
+    // Write a preview frame to storage every 500ms for popup camera preview
+    setInterval(() => {
+      if (!started || video.readyState < 2) return;
+      canvas.width = 160;
+      canvas.height = 120;
+      ctx.drawImage(video, 0, 0, 160, 120);
+      const previewDataUrl = canvas.toDataURL('image/jpeg', 0.4);
+      chrome.storage.local.set({ cameraPreviewFrame: previewDataUrl });
+    }, 500);
+
     if (landmarkerReady) {
       // MediaPipe WASM works — use it
       detectorMode = 'mediapipe-landmarker';

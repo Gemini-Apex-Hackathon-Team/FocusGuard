@@ -324,16 +324,14 @@ function setupEventListeners() {
     setTimeout(loadCameraRuntime, 300);
 
     // Toggle camera preview
-    const video = document.getElementById('camera-preview');
     const overlay = document.getElementById('camera-overlay');
     if (enabled) {
       initCameraPreview();
     } else {
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(t => t.stop());
-        cameraStream = null;
+      if (cameraPreviewInterval) {
+        clearInterval(cameraPreviewInterval);
+        cameraPreviewInterval = null;
       }
-      if (video) video.srcObject = null;
       if (overlay) {
         overlay.textContent = 'Camera off';
         overlay.classList.remove('hidden');
@@ -473,13 +471,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Camera preview — show user's webcam in popup
-let cameraStream = null;
+// Camera preview — render frames from offscreen document via storage
+let cameraPreviewInterval = null;
 
 async function initCameraPreview() {
-  const video = document.getElementById('camera-preview');
+  const canvasEl = document.getElementById('camera-canvas');
   const overlay = document.getElementById('camera-overlay');
-  if (!video || !overlay) return;
+  if (!canvasEl || !overlay) return;
+
+  const ctx = canvasEl.getContext('2d');
 
   // Check if camera is enabled in settings
   const config = await chrome.storage.local.get(['userConfig']);
@@ -490,24 +490,41 @@ async function initCameraPreview() {
     return;
   }
 
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 320, height: 240, facingMode: 'user' },
-      audio: false
-    });
-    video.srcObject = cameraStream;
-    overlay.classList.add('hidden');
-  } catch {
-    overlay.textContent = 'Camera unavailable';
-    overlay.classList.remove('hidden');
+  overlay.textContent = 'Connecting...';
+
+  function drawFrame(dataUrl) {
+    if (!dataUrl) return;
+    const img = new Image();
+    img.onload = () => {
+      canvasEl.width = img.width;
+      canvasEl.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      overlay.classList.add('hidden');
+    };
+    img.src = dataUrl;
   }
+
+  // Initial load
+  const stored = await chrome.storage.local.get(['cameraPreviewFrame']);
+  if (stored.cameraPreviewFrame) {
+    drawFrame(stored.cameraPreviewFrame);
+  }
+
+  // Poll for new frames
+  if (cameraPreviewInterval) clearInterval(cameraPreviewInterval);
+  cameraPreviewInterval = setInterval(async () => {
+    const data = await chrome.storage.local.get(['cameraPreviewFrame']);
+    if (data.cameraPreviewFrame) {
+      drawFrame(data.cameraPreviewFrame);
+    }
+  }, 600);
 }
 
-// Stop camera stream when popup closes
+// Clean up interval when popup closes
 window.addEventListener('unload', () => {
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(t => t.stop());
-    cameraStream = null;
+  if (cameraPreviewInterval) {
+    clearInterval(cameraPreviewInterval);
+    cameraPreviewInterval = null;
   }
 });
 

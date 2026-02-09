@@ -94,16 +94,9 @@ function initializeTracking() {
       const idleMs = Date.now() - engagementData.lastActivityTime;
       if (idleMs >= 10000 && !inactivityQuizFired && !document.hidden) {
         inactivityQuizFired = true;
-        // Ask background to generate and send a quiz for this page
-        const pageContent = getPageContent();
+        // Tell background to generate and push a quiz to this tab
         chrome.runtime.sendMessage({
-          type: 'GEN_QUIZ',
-          content: pageContent.text,
-          title: document.title
-        }).then(response => {
-          if (response && response.quiz) {
-            showQuizOverlay(response.quiz);
-          }
+          type: 'REQUEST_INACTIVITY_QUIZ'
         }).catch(() => {});
       }
       // Reset flag once user becomes active again
