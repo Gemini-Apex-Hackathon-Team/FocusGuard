@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FYX Focus App</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="card setup-card">
+      <h1>FYX Focus App</h1>
+      <p class="subtitle">Standalone mode with webcam focus tracking and Gemini agent coaching.</p>
+
+      <label for="goal">Session Goal</label>
+      <input id="goal" type="text" placeholder="Finish chapter 3 notes">
+
+      <div class="controls">
+        <button id="start-btn">Start Session</button>
+        <button id="stop-btn" class="secondary" disabled>Stop</button>
+      </div>
+
+      <p class="tiny">Gemini key is loaded from <code>local-config.js</code>. Camera processing stays local.</p>
+    </section>
+
+    <section class="card metrics-card">
+      <div class="metric-row">
+        <div>
+          <p class="metric-label">Focus Score</p>
+          <p class="metric-value" id="focus-score">100</p>
+        </div>
+        <div>
+          <p class="metric-label">Face State</p>
+          <p class="metric-value small" id="face-state">Idle</p>
+        </div>
+        <div>
+          <p class="metric-label">Session Time</p>
+          <p class="metric-value small" id="session-time">00:00</p>
+        </div>
+      </div>
+
+      <div class="video-wrap">
+        <video id="camera" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+
+      <div class="agent-box">
+        <h2>Gemini Agent</h2>
+        <p id="agent-status">Start a session to activate coaching.</p>
+        <ul id="agent-log"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script src="local-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

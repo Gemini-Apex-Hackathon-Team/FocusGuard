@@ -1,159 +1,169 @@
-<!-- not being used -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FYX Control Panel</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="title">FocusGuard</h1>
-            <button id="settingsButton" class="settings-button">Settings</button>
-        </header>
+  <div class="fyx-popup">
+    <!-- SVG Gradient Definition -->
+    <svg width="0" height="0" style="position: absolute;">
+      <defs>
+        <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#818cf8" />
+          <stop offset="100%" style="stop-color:#a78bfa" />
+        </linearGradient>
+      </defs>
+    </svg>
 
-        <div id="apiKeyWarning" class="warning hidden">
-            <p>Gemini API key required. Go to Settings to add your key.</p>
-        </div>
-
-        <div class="input-section">
-            <div class="input-tabs">
-                <button id="webcamTab" class="tab active">Live Webcam</button>
-                <button id="uploadTab" class="tab">Upload Image</button>
-                <button id="learningTab" class="tab">Learning Session</button>
-            </div>
-
-            <div id="webcamSection" class="input-content">
-                <video id="webcamVideo" class="video-preview" autoplay playsinline></video>
-                <div class="webcam-controls">
-                    <button id="startWebcam" class="primary-button">Start Monitoring</button>
-                    <button id="stopWebcam" class="secondary-button hidden">Stop</button>
-                </div>
-            </div>
-
-            <div id="uploadSection" class="input-content hidden">
-                <div id="dropZone" class="drop-zone">
-                    <p>Drop image here or click to select</p>
-                    <input type="file" id="fileInput" accept="image/*" class="file-input">
-                </div>
-                <img id="uploadedImage" class="uploaded-preview hidden">
-                <button id="analyzeImage" class="primary-button hidden">Analyze Image</button>
-            </div>
-
-            <div id="learningSection" class="input-content hidden">
-                <div class="learning-input">
-                    <label for="learningUrl">Learning Content URL</label>
-                    <input type="url" id="learningUrl" placeholder="https://example.com/article" class="learning-input-field">
-                    <button id="startLearningSession" class="primary-button">Start Learning Session</button>
-                </div>
-
-                <div id="learningSessionActive" class="learning-session-display hidden">
-                    <div class="session-header">
-                        <h3>Active Learning Session</h3>
-                        <button id="endLearningSession" class="secondary-button">End Session</button>
-                    </div>
-
-                    <div class="session-info">
-                        <div class="session-stat">
-                            <span class="stat-label">Focus:</span>
-                            <span id="sessionFocus" class="stat-value">--</span>
-                        </div>
-                        <div class="session-stat">
-                            <span class="stat-label">Time:</span>
-                            <span id="sessionTime" class="stat-value">00:00</span>
-                        </div>
-                        <div class="session-stat">
-                            <span class="stat-label">Distractions:</span>
-                            <span id="sessionDistractions" class="stat-value">0</span>
-                        </div>
-                    </div>
-
-                    <div class="session-progress">
-                        <p class="progress-label">Session Progress</p>
-                        <div class="progress-bar">
-                            <div id="sessionProgressBar" class="progress-fill"></div>
-                        </div>
-                    </div>
-
-                    <div id="sessionTitle" class="session-title"></div>
-                </div>
-
-                <div id="learningLoading" class="loading hidden">
-                    <div class="spinner"></div>
-                    <p>Loading content and generating quiz...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quiz Modal -->
-        <div id="quizModal" class="modal hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Focus Check</h2>
-                    <p class="modal-subtitle">Answer this question to continue</p>
-                </div>
-
-                <div id="quizContainer" class="quiz-container">
-                    <div id="questionDisplay" class="question-display">
-                        <h3 id="questionText"></h3>
-                    </div>
-
-                    <div id="optionsDisplay" class="options-display"></div>
-
-                    <button id="submitAnswerButton" class="primary-button submit-button" disabled>Submit Answer</button>
-                </div>
-
-                <div id="feedbackDisplay" class="feedback-display hidden">
-                    <div id="feedbackContent" class="feedback-content"></div>
-                    <button id="continueLearningButton" class="primary-button" style="margin-top: 15px;">Continue Learning</button>
-                </div>
-            </div>
-        </div>
-        </div>
-
-        <div id="loadingIndicator" class="loading hidden">
-            <div class="spinner"></div>
-            <p>Analyzing attention...</p>
-        </div>
-
-        <div id="resultsSection" class="results hidden">
-            <div class="score-display">
-                <div class="score-label">Attention Score</div>
-                <div id="scoreValue" class="score-value">--</div>
-                <div id="scoreBar" class="score-bar">
-                    <div id="scoreBarFill" class="score-bar-fill"></div>
-                </div>
-            </div>
-
-            <div class="level-display">
-                <span class="level-label">Level:</span>
-                <span id="levelValue" class="level-value">--</span>
-            </div>
-
-            <div class="details-section">
-                <h3>Detection Details</h3>
-                <ul id="detailsList" class="details-list"></ul>
-            </div>
-
-            <div id="geminiAnalysis" class="gemini-section hidden">
-                <h3>AI Analysis</h3>
-                <p id="geminiText" class="gemini-text"></p>
-            </div>
-
-            <div id="switchRecommendation" class="switch-section hidden">
-                <h3>Consider Switching To</h3>
-                <div id="switchContent" class="switch-content"></div>
-            </div>
-
-            <div class="recommendations-section">
-                <h3>Recommended Content Types</h3>
-                <ul id="recommendationsList" class="recommendations-list"></ul>
-            </div>
-        </div>
-
-        <div id="statusMessage" class="status-message"></div>
+    <!-- Header -->
+    <div class="fyx-popup-header">
+      <div>
+        <h1>FYX</h1>
+        <p>Focus Assistant</p>
+      </div>
     </div>
 
-    <script type="module" src="popup.js"></script>
+    <!-- Greeting -->
+    <div class="fyx-greeting" id="greeting">Hey there!</div>
+
+    <!-- Attention Score Display -->
+    <div class="fyx-score-section">
+      <div class="fyx-score-circle">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="52" class="fyx-score-bg"></circle>
+          <circle cx="65" cy="65" r="52" class="fyx-score-progress" id="score-progress"></circle>
+        </svg>
+        <div class="fyx-score-value" id="score-value">100</div>
+      </div>
+      <div class="fyx-score-label">Current Focus Score</div>
+      <div class="fyx-score-status" id="score-status">Excellent</div>
+    </div>
+
+    <!-- Insight Card -->
+    <div class="fyx-insight-card" id="insight-card">
+      <div class="insight-label">AI Insight</div>
+      <div id="insight-text"></div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="fyx-quick-actions">
+      <button class="fyx-action-btn" id="start-session">
+        <span class="fyx-btn-icon">&#9654;</span>
+        <span>Start Focus Session</span>
+      </button>
+
+      <button class="fyx-action-btn" id="take-break" style="background: var(--fyx-surface); border: 1px solid var(--fyx-border);">
+        <span class="fyx-btn-icon">&#9749;</span>
+        <span>Take a Break</span>
+      </button>
+    </div>
+
+    <!-- Session Timer -->
+    <div class="fyx-session-info" id="session-info" style="display: none;">
+      <div class="fyx-timer" id="session-timer">25:00</div>
+      <div class="fyx-timer-label">Focus Session</div>
+      <button class="fyx-action-btn fyx-btn-small" id="stop-session">Stop Session</button>
+    </div>
+
+    <!-- Statistics -->
+    <div class="fyx-stats">
+      <h3>Today's Progress</h3>
+      <div class="fyx-stat-grid">
+        <div class="fyx-stat-item">
+          <div class="fyx-stat-value" id="stat-sessions">0</div>
+          <div class="fyx-stat-label">Sessions</div>
+        </div>
+        <div class="fyx-stat-item">
+          <div class="fyx-stat-value" id="stat-focus-time">0m</div>
+          <div class="fyx-stat-label">Focus</div>
+        </div>
+        <div class="fyx-stat-item">
+          <div class="fyx-stat-value" id="stat-breaks">0</div>
+          <div class="fyx-stat-label">Breaks</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Toggle -->
+    <div class="fyx-settings-section">
+      <h3>Quick Settings</h3>
+
+      <div class="fyx-setting-item">
+        <label>
+          <span>Content Quizzes</span>
+          <input type="checkbox" id="enable-quizzes" checked>
+        </label>
+      </div>
+
+      <div class="fyx-setting-item">
+        <label>
+          <span>AI Interventions</span>
+          <input type="checkbox" id="enable-interventions" checked>
+        </label>
+      </div>
+
+      <div class="fyx-setting-item">
+        <label>
+          <span>Break Reminders</span>
+          <input type="checkbox" id="enable-breaks" checked>
+        </label>
+      </div>
+
+      <div class="fyx-setting-item">
+        <label>
+          <span>Camera Detection</span>
+          <input type="checkbox" id="enable-camera">
+        </label>
+      </div>
+
+      <div class="fyx-setting-item">
+        <label>
+          <span>Quiz Frequency</span>
+          <select id="quiz-frequency">
+            <option value="10">Every 10 min</option>
+            <option value="15" selected>Every 15 min</option>
+            <option value="20">Every 20 min</option>
+            <option value="30">Every 30 min</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="fyx-camera-runtime">
+      <h3>Camera Runtime</h3>
+      <div class="fyx-camera-grid">
+        <div class="fyx-camera-item">
+          <div class="fyx-camera-label">Status</div>
+          <div class="fyx-camera-value" id="cam-status">Unknown</div>
+        </div>
+        <div class="fyx-camera-item">
+          <div class="fyx-camera-label">Detector</div>
+          <div class="fyx-camera-value" id="cam-detector">-</div>
+        </div>
+        <div class="fyx-camera-item">
+          <div class="fyx-camera-label">Face</div>
+          <div class="fyx-camera-value" id="cam-face">-</div>
+        </div>
+        <div class="fyx-camera-item">
+          <div class="fyx-camera-label">Last Beat</div>
+          <div class="fyx-camera-value" id="cam-beat">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="fyx-popup-footer">
+      <button class="fyx-link-btn" id="open-dashboard">Dashboard</button>
+      <button class="fyx-link-btn" id="open-settings">Open App</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
+
 </html>
