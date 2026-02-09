@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to FYX</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .onboarding-container {
+      background: white;
+      border-radius: 24px;
+      max-width: 600px;
+      width: 100%;
+      padding: 48px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .onboarding-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .onboarding-header h1 {
+      font-size: 48px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .onboarding-header p {
+      font-size: 18px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    
+    .onboarding-step {
+      display: none;
+    }
+    
+    .onboarding-step.active {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .step-content {
+      margin-bottom: 32px;
+    }
+    
+    .step-content h2 {
+      font-size: 24px;
+      color: #1f2937;
+      margin-bottom: 16px;
+    }
+    
+    .step-content p {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    
+    .attention-scale {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .scale-option {
+      flex: 1;
+      padding: 16px 8px;
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .scale-option:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    
+    .scale-option.selected {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      border-color: #3b82f6;
+    }
+    
+    .scale-number {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .scale-label {
+      font-size: 11px;
+    }
+    
+    .feature-list {
+      list-style: none;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+    
+    .feature-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .feature-text h3 {
+      font-size: 16px;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+    
+    .feature-text p {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+    
+    .api-key-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+    
+    .api-key-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+    
+    .api-help {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    
+    .api-help a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    
+    .api-help a:hover {
+      text-decoration: underline;
+    }
+    
+    .onboarding-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    
+    .onboarding-btn {
+      flex: 1;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+    
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 32px;
+    }
+    
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #d1d5db;
+      transition: all 0.3s;
+    }
+    
+    .progress-dot.active {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      width: 32px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding-container">
+    <div class="onboarding-header">
+      <h1>🧠 FYX</h1>
+      <p>Focus assistant powered by AI</p>
+    </div>
+    
+    <!-- Step 1: Welcome -->
+    <div class="onboarding-step active" id="step-1">
+      <div class="step-content">
+        <h2>Welcome to FYX!</h2>
+        <p>FYX helps you work with your brain, not against it. We understand that maintaining focus in the digital age is challenging.</p>
+        
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">🎯</span>
+            <div class="feature-text">
+              <h3>Smart Attention Tracking</h3>
+              <p>Monitor your focus without being intrusive</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">🤖</span>
+            <div class="feature-text">
+              <h3>AI-Powered Interventions</h3>
+              <p>Get personalized suggestions when you need them</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">📝</span>
+            <div class="feature-text">
+              <h3>Comprehension Quizzes</h3>
+              <p>Verify you're actually learning from content</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">☕</span>
+            <div class="feature-text">
+              <h3>Smart Break Management</h3>
+              <p>Take breaks when your brain needs them</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Step 2: Attention Assessment -->
+    <div class="onboarding-step" id="step-2">
+      <div class="step-content">
+        <h2>How's your attention span?</h2>
+        <p>Be honest - this helps us personalize your experience. On a scale of 1-10, how would you rate your ability to stay focused on a single task?</p>
+        
+        <div class="attention-scale">
+          <div class="scale-option" data-value="1">
+            <div class="scale-number">1</div>
+            <div class="scale-label">Very Poor</div>
+          </div>
+          <div class="scale-option" data-value="2">
+            <div class="scale-number">2</div>
+          </div>
+          <div class="scale-option" data-value="3">
+            <div class="scale-number">3</div>
+          </div>
+          <div class="scale-option" data-value="4">
+            <div class="scale-number">4</div>
+          </div>
+          <div class="scale-option selected" data-value="5">
+            <div class="scale-number">5</div>
+            <div class="scale-label">Average</div>
+          </div>
+          <div class="scale-option" data-value="6">
+            <div class="scale-number">6</div>
+          </div>
+          <div class="scale-option" data-value="7">
+            <div class="scale-number">7</div>
+          </div>
+          <div class="scale-option" data-value="8">
+            <div class="scale-number">8</div>
+          </div>
+          <div class="scale-option" data-value="9">
+            <div class="scale-number">9</div>
+          </div>
+          <div class="scale-option" data-value="10">
+            <div class="scale-number">10</div>
+            <div class="scale-label">Excellent</div>
+          </div>
+        </div>
+        
+        <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 16px;">
+          Selected: <strong id="selected-value">5</strong>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Step 3: API Key -->
+    <div class="onboarding-step" id="step-3">
+      <div class="step-content">
+        <h2>Connect Your AI</h2>
+        <p>FYX uses Google's Gemini API for personalized interventions and quiz generation. You'll need an API key to get started.</p>
+        
+        <input 
+          type="text" 
+          class="api-key-input" 
+          id="api-key-input" 
+          placeholder="Enter your Gemini API key"
+        >
+        
+        <div class="api-help">
+          Don't have an API key? 
+          <a href="https://makersuite.google.com/app/apikey" target="_blank">Get one free here</a>
+          <br><br>
+          Your API key is stored locally and never shared.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 4: Complete -->
+    <div class="onboarding-step" id="step-4">
+      <div class="step-content">
+        <h2>🎉 You're All Set!</h2>
+        <p>FYX is now configured and ready to help you maintain better focus. Here's what happens next:</p>
+        
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">👁️</span>
+            <div class="feature-text">
+              <h3>We'll track your engagement</h3>
+              <p>Non-intrusively monitor how you interact with web content</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">💡</span>
+            <div class="feature-text">
+              <h3>Get helpful nudges</h3>
+              <p>When your focus drops, we'll suggest what to do</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">📊</span>
+            <div class="feature-text">
+              <h3>Track your progress</h3>
+              <p>See how your focus improves over time</p>
+            </div>
+          </li>
+        </ul>
+        
+        <p style="font-size: 16px; color: #6b7280; text-align: center; margin-top: 24px;">
+          Click the FYX icon in your toolbar anytime to check your focus score or start a focus session!
+        </p>
+      </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="onboarding-actions">
+      <button class="onboarding-btn btn-secondary" id="btn-back" style="display: none;">
+        Back
+      </button>
+      <button class="onboarding-btn btn-primary" id="btn-next">
+        Get Started
+      </button>
+    </div>
+    
+    <!-- Progress Dots -->
+    <div class="progress-dots">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+  
+  <script src="onboarding-handler.js"></script>
+</body>
+</html>
